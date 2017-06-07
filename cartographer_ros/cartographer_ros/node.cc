@@ -104,7 +104,7 @@ Node::Node(const NodeOptions& node_options, tf2_ros::Buffer* const tf_buffer)
   rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
 
   custom_qos_profile.depth = 50;
-  custom_qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
+  custom_qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
   custom_qos_profile.history = RMW_QOS_POLICY_HISTORY_KEEP_LAST;
 
   node_handle_ = rclcpp::Node::make_shared("cartographer_node");
@@ -284,7 +284,7 @@ void Node::LaunchSubscribers(const TrajectoryOptions& options,
 
   custom_qos_profile.history = RMW_QOS_POLICY_HISTORY_KEEP_LAST;
   custom_qos_profile.depth = 50;
-  custom_qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
+  custom_qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
   custom_qos_profile.durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
 
   if (options.use_laser_scan) {
