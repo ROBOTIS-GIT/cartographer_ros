@@ -69,7 +69,7 @@ TrajectoryOptions CreateTrajectoryOptions(
   return options;
 }
 
-bool FromRosMessage(const cartographer_ros_msgs::TrajectoryOptions& msg,
+bool FromRosMessage(const cartographer_ros_msgs::msg::TrajectoryOptions& msg,
                     TrajectoryOptions* options) {
   options->tracking_frame = msg.tracking_frame;
   options->published_frame = msg.published_frame;
@@ -93,9 +93,9 @@ bool FromRosMessage(const cartographer_ros_msgs::TrajectoryOptions& msg,
   return true;
 }
 
-cartographer_ros_msgs::TrajectoryOptions ToRosMessage(
+cartographer_ros_msgs::msg::TrajectoryOptions ToRosMessage(
     const TrajectoryOptions& options) {
-  cartographer_ros_msgs::TrajectoryOptions msg;
+	cartographer_ros_msgs::msg::TrajectoryOptions msg;
   msg.tracking_frame = options.tracking_frame;
   msg.published_frame = options.published_frame;
   msg.odom_frame = options.odom_frame;

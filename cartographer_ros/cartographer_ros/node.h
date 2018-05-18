@@ -77,16 +77,16 @@ class Node {
 
   // The following functions handle adding sensor data to a trajectory.
   void HandleOdometryMessage(int trajectory_id, const std::string& sensor_id,
-                             const nav_msgs::msg::Odometry::ConstSharedPtr& msg);
+                             const nav_msgs::msg::Odometry::ConstSharedPtr msg);
   void HandleImuMessage(int trajectory_id, const std::string& sensor_id,
-                        const sensor_msgs::msg::Imu::ConstSharedPtr& msg);
+                        const sensor_msgs::msg::Imu::ConstSharedPtr msg);
   void HandleLaserScanMessage(int trajectory_id, const std::string& sensor_id,
-                              const sensor_msgs::LaserScan::msg::ConstSharedPtr& msg);
+                              const sensor_msgs::msg::LaserScan::ConstSharedPtr msg);
   void HandleMultiEchoLaserScanMessage(
       int trajectory_id, const std::string& sensor_id,
-      const sensor_msgs::MultiEchoLaserScan::msg::ConstSharedPtr& msg);
+      const sensor_msgs::msg::MultiEchoLaserScan::ConstSharedPtr msg);
   void HandlePointCloud2Message(int trajectory_id, const std::string& sensor_id,
-                                const sensor_msgs::msg::PointCloud2::ConstSharedPtr& msg);
+                                const sensor_msgs::msg::PointCloud2::ConstSharedPtr msg);
 
   // Serializes the complete Node state.
   void SerializeState(const std::string& filename);
@@ -118,7 +118,7 @@ class Node {
       std::shared_ptr<cartographer_ros_msgs::srv::FinishTrajectory::Response> response);
   void HandleWriteState(
       const std::shared_ptr<cartographer_ros_msgs::srv::WriteState::Request> request,
-      std::shared_ptr<cartographer_ros_msgs::WriteState::Response> response);
+      std::shared_ptr<cartographer_ros_msgs::srv::WriteState::Response> response);
   // Returns the set of topic names we want to subscribe to.
   std::unordered_set<std::string> ComputeExpectedTopics(
       const TrajectoryOptions& options,

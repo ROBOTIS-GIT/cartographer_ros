@@ -79,8 +79,8 @@ class MapBuilderBridge {
   cartographer_ros_msgs::msg::SubmapList GetSubmapList(rclcpp::Clock::SharedPtr& clock);
   std::unordered_map<int, TrajectoryState> GetTrajectoryStates()
       EXCLUDES(mutex_);
-  visualization_msgs::MarkerArray GetTrajectoryNodeList();
-  visualization_msgs::MarkerArray GetConstraintList();
+  visualization_msgs::msg::MarkerArray GetTrajectoryNodeList(rclcpp::Clock::SharedPtr& clock);
+  visualization_msgs::msg::MarkerArray GetConstraintList(rclcpp::Clock::SharedPtr& clock);
 
   SensorBridge* sensor_bridge(int trajectory_id);
 

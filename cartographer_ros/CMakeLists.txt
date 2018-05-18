@@ -95,13 +95,11 @@ include_directories(
 # list(REMOVE_ITEM ALL_SRCS ${ALL_EXECUTABLES})
 
 set(ALL_SRCS
-  "cartographer_ros/assets_writer.cc"
   "cartographer_ros/map_builder_bridge.cc"
-  "cartographer_ros/map_writer.cc"
   "cartographer_ros/msg_conversion.cc"
   "cartographer_ros/node.cc"
+  "cartographer_ros/node_constants.cc"
   "cartographer_ros/node_options.cc"
-  "cartographer_ros/occupancy_grid.cc"
   "cartographer_ros/ros_log_sink.cc"
   "cartographer_ros/sensor_bridge.cc"
   "cartographer_ros/tf_bridge.cc"

@@ -49,7 +49,7 @@ SensorBridge::SensorBridge(
       trajectory_builder_(trajectory_builder) {}
 
 std::unique_ptr<::cartographer::sensor::OdometryData>
-SensorBridge::ToOdometryData(const nav_msgs::Odometry::msg::ConstSharedPtr& msg) {
+SensorBridge::ToOdometryData(const nav_msgs::msg::Odometry::ConstSharedPtr& msg) {
   const carto::common::Time time = FromRos(msg->header.stamp);
   const auto sensor_to_tracking = tf_bridge_.LookupToTracking(
       time, CheckNoLeadingSlash(msg->child_frame_id));

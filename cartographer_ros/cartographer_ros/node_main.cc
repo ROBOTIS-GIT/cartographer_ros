@@ -42,7 +42,6 @@ namespace cartographer_ros {
 namespace {
 
 void Run() {
-  const auto options = LoadOptions();
   constexpr double kTfBufferCacheTimeInSeconds = 1e6;
   tf2_ros::Buffer tf_buffer{::tf2::durationFromSec(kTfBufferCacheTimeInSeconds)};
   tf2_ros::TransformListener tf(tf_buffer);

@@ -24,6 +24,7 @@
 
 #include "glog/logging.h"
 
+#include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/transform.hpp>
@@ -234,8 +235,8 @@ geometry_msgs::msg::Pose ToGeometryMsgPose(const Rigid3d& rigid3d) {
   return pose;
 }
 
-geometry_msgs::Point ToGeometryMsgPoint(const Eigen::Vector3d& vector3d) {
-  geometry_msgs::Point point;
+geometry_msgs::msg::Point ToGeometryMsgPoint(const Eigen::Vector3d& vector3d) {
+  geometry_msgs::msg::Point point;
   point.x = vector3d.x();
   point.y = vector3d.y();
   point.z = vector3d.z();

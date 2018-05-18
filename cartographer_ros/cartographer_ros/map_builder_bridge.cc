@@ -37,7 +37,8 @@ constexpr double kConstraintMarkerScale = 0.025;
 }
 
 visualization_msgs::msg::Marker CreateTrajectoryMarker(const int trajectory_id,
-                                                       const std::string& frame_id) {
+                                                       const std::string& frame_id,
+                                                       rclcpp::Clock::SharedPtr& clock) {
   visualization_msgs::msg::Marker marker;
   marker.ns = "Trajectory " + std::to_string(trajectory_id);
   marker.id = 0;
@@ -138,8 +139,8 @@ bool MapBuilderBridge::HandleSubmapQuery(
     const std::shared_ptr<::cartographer_ros_msgs::srv::SubmapQuery::Request> request,
     std::shared_ptr<::cartographer_ros_msgs::srv::SubmapQuery::Response> response) {
   cartographer::mapping::proto::SubmapQuery::Response response_proto;
-  cartographer::mapping::SubmapId submap_id{request.trajectory_id,
-                                            request.submap_index};
+  cartographer::mapping::SubmapId submap_id{request->trajectory_id,
+                                            request->submap_index};
   const std::string error =
       map_builder_.SubmapToProto(submap_id, &response_proto);
   if (!error.empty()) {
@@ -210,19 +211,19 @@ MapBuilderBridge::GetTrajectoryStates() {
   return trajectory_states;
 }
 
-visualization_msgs::MarkerArray MapBuilderBridge::GetTrajectoryNodeList() {
-  visualization_msgs::MarkerArray trajectory_node_list;
+visualization_msgs::msg::MarkerArray MapBuilderBridge::GetTrajectoryNodeList(rclcpp::Clock::SharedPtr& clock) {
+  visualization_msgs::msg::MarkerArray trajectory_node_list;
   const auto nodes = map_builder_.pose_graph()->GetTrajectoryNodes();
   for (const int trajectory_id : nodes.trajectory_ids()) {
-    visualization_msgs::Marker marker =
-        CreateTrajectoryMarker(trajectory_id, node_options_.map_frame);
+    visualization_msgs::msg::Marker marker =
+        CreateTrajectoryMarker(trajectory_id, node_options_.map_frame, clock);
 
     for (const auto& node_id_data : nodes.trajectory(trajectory_id)) {
       if (node_id_data.data.constant_data == nullptr) {
         PushAndResetLineMarker(&marker, &trajectory_node_list.markers);
         continue;
       }
-      const ::geometry_msgs::Point node_point =
+      const ::geometry_msgs::msg::Point node_point =
           ToGeometryMsgPoint(node_id_data.data.global_pose.translation());
       marker.points.push_back(node_point);
       // Work around the 16384 point limit in RViz by splitting the
@@ -238,19 +239,19 @@ visualization_msgs::MarkerArray MapBuilderBridge::GetTrajectoryNodeList() {
   return trajectory_node_list;
 }
 
-visualization_msgs::MarkerArray MapBuilderBridge::GetConstraintList() {
-  visualization_msgs::MarkerArray constraint_list;
+visualization_msgs::msg::MarkerArray MapBuilderBridge::GetConstraintList(rclcpp::Clock::SharedPtr& clock) {
+  visualization_msgs::msg::MarkerArray constraint_list;
   int marker_id = 0;
-  visualization_msgs::Marker constraint_intra_marker;
+  visualization_msgs::msg::Marker constraint_intra_marker;
   constraint_intra_marker.id = marker_id++;
   constraint_intra_marker.ns = "Intra constraints";
-  constraint_intra_marker.type = visualization_msgs::Marker::LINE_LIST;
-  constraint_intra_marker.header.stamp = ros::Time::now();
+  constraint_intra_marker.type = visualization_msgs::msg::Marker::LINE_LIST;
+  constraint_intra_marker.header.stamp = clock->now();
   constraint_intra_marker.header.frame_id = node_options_.map_frame;
   constraint_intra_marker.scale.x = kConstraintMarkerScale;
   constraint_intra_marker.pose.orientation.w = 1.0;
 
-  visualization_msgs::Marker residual_intra_marker = constraint_intra_marker;
+  visualization_msgs::msg::Marker residual_intra_marker = constraint_intra_marker;
   residual_intra_marker.id = marker_id++;
   residual_intra_marker.ns = "Intra residuals";
   // This and other markers which are less numerous are set to be slightly
@@ -258,12 +259,12 @@ visualization_msgs::MarkerArray MapBuilderBridge::GetConstraintList() {
   // visible.
   residual_intra_marker.pose.position.z = 0.1;
 
-  visualization_msgs::Marker constraint_inter_marker = constraint_intra_marker;
+  visualization_msgs::msg::Marker constraint_inter_marker = constraint_intra_marker;
   constraint_inter_marker.id = marker_id++;
   constraint_inter_marker.ns = "Inter constraints";
   constraint_inter_marker.pose.position.z = 0.1;
 
-  visualization_msgs::Marker residual_inter_marker = constraint_intra_marker;
+  visualization_msgs::msg::Marker residual_inter_marker = constraint_intra_marker;
   residual_inter_marker.id = marker_id++;
   residual_inter_marker.ns = "Inter residuals";
   residual_inter_marker.pose.position.z = 0.1;
@@ -273,8 +274,8 @@ visualization_msgs::MarkerArray MapBuilderBridge::GetConstraintList() {
   const auto constraints = map_builder_.pose_graph()->constraints();
 
   for (const auto& constraint : constraints) {
-    visualization_msgs::Marker *constraint_marker, *residual_marker;
-    std_msgs::ColorRGBA color_constraint, color_residual;
+    visualization_msgs::msg::Marker *constraint_marker, *residual_marker;
+    std_msgs::msg::ColorRGBA color_constraint, color_residual;
     if (constraint.tag ==
         cartographer::mapping::PoseGraph::Constraint::INTRA_SUBMAP) {
       constraint_marker = &constraint_intra_marker;
