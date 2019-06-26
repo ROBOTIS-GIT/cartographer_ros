@@ -56,16 +56,12 @@ class OccupancyGridNode : public rclcpp::Node
   : Node("cartographer_occupancy_grid_node"),
     resolution_(resolution)
   {
-    rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
-
-    custom_qos_profile.depth = 50;
-    custom_qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
-    custom_qos_profile.history = RMW_QOS_POLICY_HISTORY_KEEP_LAST;
+    auto custom_qos_profile = rclcpp::QoS(rclcpp::KeepLast(50));
 
     client_ = this->create_client<cartographer_ros_msgs::srv::SubmapQuery>(kSubmapQueryServiceName);
 
     occupancy_grid_publisher_ =  this->create_publisher<::nav_msgs::msg::OccupancyGrid>(
-          kOccupancyGridTopic);
+          kOccupancyGridTopic, custom_qos_profile);
 
     occupancy_grid_publisher_timer_ = this->create_wall_timer(
       std::chrono::milliseconds(int(publish_period_sec * 1000)),
@@ -151,7 +147,7 @@ class OccupancyGridNode : public rclcpp::Node
       };
 
     submap_list_subscriber_ = create_subscription<cartographer_ros_msgs::msg::SubmapList>(
-      kSubmapListTopic, handleSubmapList, custom_qos_profile);
+      kSubmapListTopic, custom_qos_profile, handleSubmapList);
   }
 
   void DrawAndPublish(void) 

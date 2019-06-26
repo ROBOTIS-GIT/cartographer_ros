@@ -66,12 +66,13 @@ template <typename MessageType>
     void (Cartographer::*handler)(int, const std::string&,
                           const typename MessageType::ConstSharedPtr),
     const int trajectory_id, const std::string& topic,
-    ::rclcpp::Node::SharedPtr node_handle, Cartographer* const node, rmw_qos_profile_t custom_qos_profile) {
+    ::rclcpp::Node::SharedPtr node_handle, Cartographer* const node, rclcpp::QoS custom_qos_profile) {
   return node_handle->create_subscription<MessageType>(
       topic,
+      custom_qos_profile,
       [node, handler, trajectory_id, topic](const typename MessageType::ConstSharedPtr msg) {
             (node->*handler)(trajectory_id, topic, msg);
-      }, custom_qos_profile);
+      });
 }
 
 }  // namespace
@@ -97,11 +98,7 @@ Cartographer::Cartographer(
 
   carto::common::MutexLocker lock(&mutex_);
 
-  rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
-
-  custom_qos_profile.depth = 50;
-  custom_qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
-  custom_qos_profile.history = RMW_QOS_POLICY_HISTORY_KEEP_LAST;
+  auto custom_qos_profile = rclcpp::QoS(rclcpp::KeepLast(50));
 
   submap_list_publisher_ =
       this->create_publisher<::cartographer_ros_msgs::msg::SubmapList>(
@@ -412,12 +409,7 @@ int Cartographer::AddTrajectory(const TrajectoryOptions& options,
 void Cartographer::LaunchSubscribers(const TrajectoryOptions& options,
                              const cartographer_ros_msgs::msg::SensorTopics& topics,
                              const int trajectory_id) {
-  rmw_qos_profile_t custom_qos_profile = rmw_qos_profile_default;
-
-  custom_qos_profile.history = RMW_QOS_POLICY_HISTORY_KEEP_LAST;
-  custom_qos_profile.depth = 50;
-  custom_qos_profile.reliability = RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT;
-  custom_qos_profile.durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
+  auto custom_qos_profile = rclcpp::QoS(rclcpp::KeepLast(50));
 
   // TODO(mikaelarguedas) pass qos profile aroung
   for (const std::string& topic : ComputeRepeatedTopicNames(
