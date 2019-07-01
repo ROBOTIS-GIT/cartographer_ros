@@ -409,7 +409,7 @@ int Cartographer::AddTrajectory(const TrajectoryOptions& options,
 void Cartographer::LaunchSubscribers(const TrajectoryOptions& options,
                              const cartographer_ros_msgs::msg::SensorTopics& topics,
                              const int trajectory_id) {
-  auto custom_qos_profile = rclcpp::QoS(rclcpp::KeepLast(50));
+  auto custom_qos_profile = rclcpp::SensorDataQoS();
 
   // TODO(mikaelarguedas) pass qos profile aroung
   for (const std::string& topic : ComputeRepeatedTopicNames(
